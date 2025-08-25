@@ -1,0 +1,93 @@
+name: CI/CD - My-World (React)
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'my-world/**'
+      - '.github/workflows/workflow.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: front-deploy
+  cancel-in-progress: true
+
+env:
+  IMAGE: ghcr.io/${{ secrets.GHCR_USER }}/my-world
+  DOMAIN: my-world-castruche.duckdns.org
+  
+jobs:
+  check-secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Vérifier secrets GHCR
+        run: |
+          if [ -z "${{ secrets.GHCR_USER }}" ]; then
+            echo "❌ Secret GHCR_USER manquant"
+            exit 1
+          fi
+          if [ -z "${{ secrets.GHCR_TOKEN }}" ]; then
+            echo "❌ Secret GHCR_TOKEN manquant"
+            exit 1
+          fi
+          echo "✅ Secrets GHCR présents"
+
+  build-and-push:
+    runs-on: ubuntu-latest
+    needs: check-secrets
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compute image tag
+        id: vars
+        run: echo "TAG=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
+      - name: Login GHCR
+        run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ secrets.GHCR_USER }} --password-stdin
+
+      - name: Build image
+        run: |
+          docker build -t $IMAGE:latest -t $IMAGE:${{ steps.vars.outputs.TAG }} .
+
+      - name: Push images
+        run: |
+          docker push $IMAGE:latest
+          docker push $IMAGE:${{ steps.vars.outputs.TAG }}
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [check-secrets, build-and-push]
+    steps:
+      - name: Install SSH key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_KEY }}
+
+      - name: Deploy My World
+        env:
+          GHCR_USER: ${{ secrets.GHCR_USER }}
+          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+        run: |
+          ssh -4 -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
+            set -e
+            echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
+            docker pull ghcr.io/$GHCR_USER/my-world:latest
+            docker stop my-world || true
+            docker rm my-world || true
+            # 1) Router HTTPS (principal)
+            docker network create edge || true
+            docker run -d --name my-world \
+              --restart=always \
+              --network edge \
+              --label 'traefik.enable=true' \
+              --label 'traefik.docker.network=edge' \
+              --label "traefik.http.routers.my-world.rule=Host(\"$DOMAIN\")" \
+              --label 'traefik.http.routers.my-world.entrypoints=websecure' \
+              --label 'traefik.http.routers.my-world.tls.certresolver=le' \
+              --label 'traefik.http.services.my-world.loadbalancer.server.port=80' \
+              ghcr.io/$GHCR_USER/my-world:latest
+          EOF
