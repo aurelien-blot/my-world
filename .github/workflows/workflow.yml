@@ -34,7 +34,7 @@ jobs:
             echo "❌ Secret GHCR_TOKEN manquant"
             exit 1
           fi
-          echo "✅ Secrets GHCR présents"
+          echo "✅ Secrets GHCR présents !"
 
   build-and-push:
     runs-on: ubuntu-latest
