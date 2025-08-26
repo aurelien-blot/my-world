@@ -3,9 +3,6 @@ name: CI/CD - My-World (React)
 on:
   push:
     branches: [ main ]
-    paths:
-      - 'my-world/**'
-      - '.github/workflows/workflow.yml'
   workflow_dispatch:
 
 permissions:
