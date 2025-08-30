@@ -1,13 +1,14 @@
-import TextAreaInput from "../../../inputs/TextAreaInput.tsx";
 import {Send} from "lucide-react"
-import {ImageUp} from "lucide-react"
 import {type FormEvent, useState} from "react";
 import PrimaryBtn from "../../../buttons/PrimaryBtn.tsx";
-import MinorBtn from "../../../buttons/MinorBtn.tsx";
+import NewPostForm from "./NewPost/NewPostForm.tsx";
+import type {Post} from "../../../../models/Post/model.ts";
 
-function Header({postBtnClick, newPostContent, handlePostContentChange}: {
+function Header({postBtnClick, newPost, handleNewPostContentChange, handleNewPostImagesChange}: {
     postBtnClick: () => void,
-    newPostContent: string, handlePostContentChange: (value: string) => void
+    newPost: Post,
+    handleNewPostContentChange: (value: string) => void,
+    handleNewPostImagesChange: (value: string[]) => void
 }) {
     const [isNewPostAreaVisible, setIsNewPostAreaVisible] = useState(false);
 
@@ -15,14 +16,10 @@ function Header({postBtnClick, newPostContent, handlePostContentChange}: {
         setIsNewPostAreaVisible(true);
     };
 
-    const submitNewPost = (event: FormEvent) => {
+    const onSubmitForm = (event: FormEvent) => {
         event.preventDefault();
         postBtnClick();
         setIsNewPostAreaVisible(false);
-    };
-
-    const addPicture = () => {
-
     };
 
     return (
@@ -36,20 +33,9 @@ function Header({postBtnClick, newPostContent, handlePostContentChange}: {
                 />
             </div>
             <div className={isNewPostAreaVisible ? "block p-4 " : "hidden"}>
-                <div className="max-w-xl mx-auto">
-                    <form onSubmit={submitNewPost}>
-                        <TextAreaInput name="newPostContentInput" value={newPostContent}
-                                       onChange={handlePostContentChange}/>
-                        <div>
-                            <MinorBtn onClick={addPicture} icon={<ImageUp className="h-4 w-4"/>}
-                                      tooltip="Ajouter une photo"/>
-                        </div>
-                        <div className="flex justify-center">
-                            <PrimaryBtn label="Poster" icon={<Send className="h-4 w-4"/>}
-                            submit={true}/>
-                        </div>
-                    </form>
-                </div>
+                <NewPostForm onSubmit={onSubmitForm} newPost={newPost}
+                             handleNewPostContentChange={handleNewPostContentChange}
+                             handleNewPostImagesChange={handleNewPostImagesChange}  />
             </div>
         </>
     );

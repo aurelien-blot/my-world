@@ -1,4 +1,5 @@
 export interface Post {
-    id: number
+    id? : number
     content: string
+    images: string[]
 }

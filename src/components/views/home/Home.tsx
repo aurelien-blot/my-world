@@ -7,35 +7,50 @@ const postContentList = new Array<Post>(
     {
         id: 1,
         content: "This is the first post",
+        images: ["image1.png", "image2.png"]
     },
     {
         id: 2,
         content: "This is the second post",
+        images: []
     },
 );
 
 function Home() {
+    const newEmptyPost = {content: "", images: [] as string[]};
     const [postList, setPostList] = useState(postContentList);
-    const [newPostContent, setNewPostContent] = useState("");
+
+    const [newPost, setNewPost] = useState(newEmptyPost);
 
     const postBtnClick = () => {
         const tempPostList = [...postList];
         tempPostList.push({
             id: postList.length + 1,
-            content: newPostContent,
+            content: newPost.content,
+            images: newPost.images,
         });
         setPostList(tempPostList);
-        setNewPostContent("");
+        setNewPost(newEmptyPost);
     };
 
-    const handlePostContentChange = (value: string ) => {
-        setNewPostContent(value);
+    const handleNewPostContentChange = (value: string) => {
+        const tempPost = {...newPost};
+        tempPost.content = value;
+        setNewPost(tempPost);
+    };
+
+    const handleNewPostImagesChange = (value: string[]) => {
+        const tempPost = {...newPost};
+        tempPost.images = value;
+        setNewPost(tempPost);
     };
 
     return (
         <>
-            <Header handlePostContentChange={handlePostContentChange}
-                    newPostContent={newPostContent} postBtnClick={postBtnClick}/>
+            <Header newPost={newPost} postBtnClick={postBtnClick}
+                    handleNewPostContentChange={handleNewPostContentChange}
+                    handleNewPostImagesChange={handleNewPostImagesChange}
+            />
             <Feed postList={postList}/>
         </>
     )
