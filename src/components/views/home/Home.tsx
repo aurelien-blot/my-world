@@ -18,7 +18,7 @@ function Home() {
     const [postList, setPostList] = useState(postContentList);
     const [newPostContent, setNewPostContent] = useState("");
 
-    function postBtnClick() {
+    const postBtnClick = () => {
         const tempPostList = [...postList];
         tempPostList.push({
             id: postList.length + 1,
@@ -26,11 +26,11 @@ function Home() {
         });
         setPostList(tempPostList);
         setNewPostContent("");
-    }
+    };
 
-    function handlePostContentChange(value: string ) {
+    const handlePostContentChange = (value: string ) => {
         setNewPostContent(value);
-    }
+    };
 
     return (
         <>

@@ -1,3 +1,4 @@
+import './App.css'
 import { Routes, Route, Outlet } from "react-router-dom";
 import Home from "../views/home/Home.tsx";
 import Profile from "../views/profile/Profile.tsx";
@@ -8,7 +9,9 @@ function Layout() {
     return (
         <>
             <NavigationBar /> {/* affiché une seule fois */}
-            <Outlet /> {/* ici s’affichent les pages */}
+            <div className="md:mt-10 mainContent">
+                <Outlet /> {/* ici s’affichent les pages */}
+            </div>
         </>
     );
 }
