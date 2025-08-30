@@ -1,13 +1,14 @@
 import type {ReactNode} from "react";
 import CustomBtn from "./CustomBtn.tsx";
 
-function MinorBtn({label, icon, onClick, extraClass, tooltip, submit}: {
+function MinorBtn({label, icon, onClick, extraClass, tooltip, submit, disabled}: {
     label?: string,
     icon?: ReactNode,
     onClick: () => void,
     extraClass?: string,
     tooltip?: string,
-    submit?: boolean
+    submit?: boolean,
+    disabled?: boolean
 }) {
     return (
         <CustomBtn label={label}
@@ -16,6 +17,7 @@ function MinorBtn({label, icon, onClick, extraClass, tooltip, submit}: {
                    onClick={onClick}
                    extraClass={`bg-gray-500 rounded p-2 m-2 ${extraClass}`}
                    tooltip={tooltip} submit={submit}
+                   disabled={disabled}
         />
     )
 }

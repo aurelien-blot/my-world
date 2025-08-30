@@ -20,7 +20,7 @@ function Home() {
     const newEmptyPost = {content: "", images: [] as string[]};
     const [postList, setPostList] = useState(postContentList);
 
-    const [newPost, setNewPost] = useState(newEmptyPost);
+    const [newPost, setNewPost] = useState<Post>(newEmptyPost);
 
     const postBtnClick = () => {
         const tempPostList = [...postList];
