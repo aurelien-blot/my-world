@@ -7,17 +7,17 @@ const postContentList = new Array<Post>(
     {
         id: 1,
         content: "This is the first post",
-        images: ["image1.png", "image2.png"]
+        files: []
     },
     {
         id: 2,
         content: "This is the second post",
-        images: []
+        files: []
     },
 );
 
 function Home() {
-    const newEmptyPost = {content: "", images: [] as string[]};
+    const newEmptyPost = {content: "", files: [] as File[]};
     const [postList, setPostList] = useState(postContentList);
 
     const [newPost, setNewPost] = useState<Post>(newEmptyPost);
@@ -27,7 +27,7 @@ function Home() {
         tempPostList.push({
             id: postList.length + 1,
             content: newPost.content,
-            images: newPost.images,
+            files: newPost.files,
         });
         setPostList(tempPostList);
         setNewPost(newEmptyPost);
@@ -39,9 +39,9 @@ function Home() {
         setNewPost(tempPost);
     };
 
-    const handleNewPostImagesChange = (value: string[]) => {
+    const handleNewPostImagesChange = (value: File[]) => {
         const tempPost = {...newPost};
-        tempPost.images = value;
+        tempPost.files = value;
         setNewPost(tempPost);
     };
 

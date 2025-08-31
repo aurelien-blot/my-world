@@ -8,7 +8,7 @@ function Header({postBtnClick, newPost, handleNewPostContentChange, handleNewPos
     postBtnClick: () => void,
     newPost: Post,
     handleNewPostContentChange: (value: string) => void,
-    handleNewPostImagesChange: (value: string[]) => void
+    handleNewPostImagesChange: (value: File[]) => void
 }) {
     const [isNewPostAreaVisible, setIsNewPostAreaVisible] = useState(false);
 

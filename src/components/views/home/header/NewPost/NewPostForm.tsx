@@ -10,23 +10,26 @@ function NewPostForm({onSubmit, newPost, handleNewPostContentChange, handleNewPo
     onSubmit: (event: FormEvent) => void,
     newPost: Post,
     handleNewPostContentChange: (value: string) => void,
-    handleNewPostImagesChange: (value: string[]) => void
+    handleNewPostImagesChange: (value: File[]) => void
 }) {
 
     const [previews, setPreviews] = useState([] as string[]);
     const fileInputRef = useRef<HTMLInputElement | null>(null)
 
+    const handleSubmit = (e: FormEvent) => {
+        onSubmit(e);
+        setPreviews([]);
+        fileInputRef.current!.value = "";
+    }
     const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-        //TODO RETIRER
-
         if (event.target.files) {
-            const fileNameList = [];
+            const fileList = [] as File[];
             const filePreviewList = [];
             for (const file of event.target.files) {
-                fileNameList.push(file.name);
+                fileList.push(file);
                 filePreviewList.push(URL.createObjectURL(file));
             }
-            handleNewPostImagesChange(fileNameList);
+            handleNewPostImagesChange(fileList);
             setPreviews(filePreviewList);
         } else {
             handleNewPostImagesChange([]);
@@ -36,21 +39,23 @@ function NewPostForm({onSubmit, newPost, handleNewPostContentChange, handleNewPo
         fileInputRef.current?.click()
     };
 
-    const postDisabled = newPost.content.length === 0 && newPost.images.length === 0;
+    const postDisabled = newPost.content.length === 0 && newPost.files.length === 0;
 
     return (
         <>
             <div className="max-w-xl mx-auto">
-                <form onSubmit={onSubmit}>
+                <form onSubmit={handleSubmit}>
                     <TextAreaInput name="newPostContentInput" value={newPost.content}
                                    onChange={handleNewPostContentChange}/>
-                    <div>
-                        {previews.length > 0 && previews.map((img, index) => (
-                            <img key={index} src={img} alt={"image_"+index}
-                                width={150}  className=""/>
+                    {previews.length > 0 &&
+                        <div className="flex overflow-x-scroll">
+                            {previews.map((img, index) => (
+                                <img key={index} src={img} alt={"image_" + index}
+                                     className="max-h-[5rem] object-contain rounded mr-2"/>
                             ))
-                        }
-                    </div>
+                            }
+                        </div>
+                    }
                     <div>
                         <input type="file" id="fileInput"
                                ref={fileInputRef}
