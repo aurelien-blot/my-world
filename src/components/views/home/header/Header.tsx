@@ -16,6 +16,12 @@ function Header({postBtnClick, newPost, handleNewPostContentChange, handleNewPos
         setIsNewPostAreaVisible(true);
     };
 
+    const hideNewPostArea = () => {
+        handleNewPostContentChange("");
+        handleNewPostImagesChange([]);
+        setIsNewPostAreaVisible(false);
+    };
+
     const onSubmitForm = (event: FormEvent) => {
         event.preventDefault();
         postBtnClick();
@@ -29,11 +35,11 @@ function Header({postBtnClick, newPost, handleNewPostContentChange, handleNewPos
                 <PrimaryBtn label="Nouveau Post"
                             onClick={showNewPostArea}
                             icon={<Send className="h-4 w-4"/>}
-                            extraClass="fixed right-10 "
+                            extraClass="fixed right-10 mt-4 md:mt-2 "
                 />
             </div>
             <div className={isNewPostAreaVisible ? "block p-4 " : "hidden"}>
-                <NewPostForm onSubmit={onSubmitForm} newPost={newPost}
+                <NewPostForm onSubmit={onSubmitForm} newPost={newPost} onCancel={hideNewPostArea}
                              handleNewPostContentChange={handleNewPostContentChange}
                              handleNewPostImagesChange={handleNewPostImagesChange}  />
             </div>

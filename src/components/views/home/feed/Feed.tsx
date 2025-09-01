@@ -19,7 +19,7 @@ function Feed({postList}: { postList: Post[] }) {
     }
 
     const postEltList = postList.map((post) => (
-                <PostCard post={post} openImagesModal={openImagesModal} />
+                <PostCard post={post} key={post.id} openImagesModal={openImagesModal} />
             )
         )
     ;

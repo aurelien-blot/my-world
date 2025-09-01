@@ -1,16 +1,18 @@
 import TextAreaInput from "../../../../inputs/TextAreaInput.tsx";
 import {Send} from "lucide-react"
-import {ImageUp} from "lucide-react"
+import {ImageUp, X} from "lucide-react"
 import PrimaryBtn from "../../../../buttons/PrimaryBtn.tsx";
 import MinorBtn from "../../../../buttons/MinorBtn.tsx";
 import {type ChangeEvent, type FormEvent, useRef, useState} from "react";
 import type {Post} from "../../../../../models/Post/model.ts";
+import SecondaryBtn from "../../../../buttons/SecondaryBtn.tsx";
 
-function NewPostForm({onSubmit, newPost, handleNewPostContentChange, handleNewPostImagesChange}: {
+function NewPostForm({onSubmit, newPost, handleNewPostContentChange, handleNewPostImagesChange, onCancel}: {
     onSubmit: (event: FormEvent) => void,
     newPost: Post,
     handleNewPostContentChange: (value: string) => void,
-    handleNewPostImagesChange: (value: File[]) => void
+    handleNewPostImagesChange: (value: File[]) => void,
+    onCancel: () => void
 }) {
 
     const [previews, setPreviews] = useState([] as string[]);
@@ -68,6 +70,8 @@ function NewPostForm({onSubmit, newPost, handleNewPostContentChange, handleNewPo
                     <div className="flex justify-center">
                         <PrimaryBtn label="Poster" icon={<Send className="h-4 w-4"/>} disabled={postDisabled}
                                     submit={true}/>
+                        <SecondaryBtn label="Annuler" icon={<X className="h-4 w-4"/>} onClick={onCancel}
+                                    />
                     </div>
                 </form>
             </div>
