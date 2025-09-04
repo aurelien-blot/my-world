@@ -1,15 +1,16 @@
 import {useState} from "react";
 import PrimaryBtn from "../../buttons/PrimaryBtn.tsx";
-import {useMutation} from "@tanstack/react-query";
+import {useMutation, useQuery} from "@tanstack/react-query";
 import {loginService} from "../../../services/api/loginService.ts";
 import type {LoginUserRequest} from "../../../models/Login/loginUserRequest.ts";
+import {testService} from "../../../services/api/testService.ts";
 
 function LoginView() {
 
-    /*const { data: testResponse, error, isLoading } = useQuery({
+    const { data: testResponse, error, isLoading } = useQuery({
         queryKey: ["test"],      // identifiant du cache
         queryFn: testService.test,
-    });*/
+    });
 
     const loginMutation = useMutation({
         mutationFn: (loginRequest: LoginUserRequest) => loginService.login(loginRequest),
@@ -27,6 +28,7 @@ function LoginView() {
     const [errorMsg, setErrorMsg] = useState('');
 
     const loginAttempt = () => {
+        console.log(testResponse, error, isLoading);
         loginMutation.mutate({identifier, password});
         setErrorMsg('Erreur de connexion');
     }
