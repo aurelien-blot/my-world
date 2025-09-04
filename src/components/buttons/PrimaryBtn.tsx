@@ -10,7 +10,7 @@ function PrimaryBtn({label, icon, onClick, extraClass, tooltip, submit, disabled
                         tooltip?: string,
                         submit?: boolean,
                         disabled?: boolean,
-                        resize : boolean
+                        resize? : boolean
                     }) {
 
     const labelClass = resize?"hidden md:inline":"inline";
