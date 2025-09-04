@@ -1,38 +1,47 @@
 import {useState} from "react";
 import PrimaryBtn from "../../buttons/PrimaryBtn.tsx";
-import {useQuery} from "@tanstack/react-query";
-import {testService} from "../../../services/api/testService.ts";
+import {useMutation} from "@tanstack/react-query";
+import {loginService} from "../../../services/api/loginService.ts";
+import type {LoginUserRequest} from "../../../models/Login/loginUserRequest.ts";
 
 function LoginView() {
 
-    const { data: testResponse, error, isLoading } = useQuery({
+    /*const { data: testResponse, error, isLoading } = useQuery({
         queryKey: ["test"],      // identifiant du cache
         queryFn: testService.test,
+    });*/
+
+    const loginMutation = useMutation({
+        mutationFn: (loginRequest: LoginUserRequest) => loginService.login(loginRequest),
+        onSuccess: (user) => {
+            console.log("Utilisateur connecté :", user);
+            // TODO : sauvegarder token / rediriger
+        },
+        onError: () => {
+            setErrorMsg("Erreur de connexion");
+        },
     });
 
-    const [email, setEmail] = useState('');
+    const [identifier, setIdentifier] = useState('');
     const [password, setPassword] = useState('');
     const [errorMsg, setErrorMsg] = useState('');
 
     const loginAttempt = () => {
-        console.log(email, password);
-        console.log(testResponse);
-        console.log(error);
-        console.log(isLoading);
+        loginMutation.mutate({identifier, password});
         setErrorMsg('Erreur de connexion');
     }
     return (
         <div className="flex items-center justify-center min-h-screen">
             <div className="w-full max-w-md bg-gray-600 shadow-lg rounded-xl p-8">
                 <h1 className="text-2xl font-bold text-center text-gray-200 mb-6">Connexion</h1>
-                {error && <p className="text-sm text-red-500 mb-4">{errorMsg}</p>}
+                {errorMsg && <p className="text-sm text-red-500 mb-4">{errorMsg}</p>}
                 <form className="space-y-5"
                       onSubmit={(e) => e.preventDefault()}>
                     <div className="flex flex-col items-start">
-                        <label htmlFor="username" className="font-medium text-gray-300 mb-1">Nom d'utilisateur</label>
-                        <input onChange={(e) => setEmail(e.target.value)}
-                               type="text" name="username" id="username" placeholder="Nom d'utilisateur"
-                               autoComplete="username"
+                        <label htmlFor="identifier" className="font-medium text-gray-300 mb-1">Nom d'utilisateur</label>
+                        <input onChange={(e) => setIdentifier(e.target.value)}
+                               type="text" name="identifier" id="identifier" placeholder="Nom d'utilisateur"
+                               autoComplete="identifier"
                                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                         ></input>
                     </div>

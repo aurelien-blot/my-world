@@ -1,4 +1,4 @@
-import type {Post} from "../../../../models/Post/model.ts";
+import type {Post} from "../../../../models/Post/post.ts";
 import {useState} from "react";
 import FullScreenModal from "../../../modals/FullScreenModal.tsx";
 import Gallery from "./gallery/Gallery.tsx";

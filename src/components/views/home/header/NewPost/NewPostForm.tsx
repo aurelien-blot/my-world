@@ -4,7 +4,7 @@ import {ImageUp, X} from "lucide-react"
 import PrimaryBtn from "../../../../buttons/PrimaryBtn.tsx";
 import MinorBtn from "../../../../buttons/MinorBtn.tsx";
 import {type ChangeEvent, type FormEvent, useRef, useState} from "react";
-import type {Post} from "../../../../../models/Post/model.ts";
+import type {Post} from "../../../../../models/Post/post.ts";
 import SecondaryBtn from "../../../../buttons/SecondaryBtn.tsx";
 
 function NewPostForm({onSubmit, newPost, handleNewPostContentChange, handleNewPostImagesChange, onCancel}: {

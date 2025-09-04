@@ -1,7 +1,7 @@
 import {useState} from "react";
 import Header from "./header/Header.tsx";
 import Feed from "./feed/Feed.tsx";
-import type {Post} from "../../../models/Post/model.ts";
+import type {Post} from "../../../models/Post/post.ts";
 
 const postContentList = new Array<Post>(
     {

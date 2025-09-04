@@ -1,5 +1,5 @@
 import {CircleUser} from "lucide-react";
-import type {Post} from "../../../../../models/Post/model.ts";
+import type {Post} from "../../../../../models/Post/post.ts";
 
 function PostCard({post, openImagesModal}:{
     post : Post,
