@@ -3,34 +3,20 @@ import Header from "./header/Header.tsx";
 import Feed from "./feed/Feed.tsx";
 import type {Post} from "../../../models/Post/post.ts";
 
-const postContentList = new Array<Post>(
-    {
-        id: 1,
-        content: "This is the first post",
-        files: []
-    },
-    {
-        id: 2,
-        content: "This is the second post",
-        files: []
-    },
-);
-
 function Home() {
     const newEmptyPost = {content: "", files: [] as File[]};
-    const [postList, setPostList] = useState(postContentList);
 
     const [newPost, setNewPost] = useState<Post>(newEmptyPost);
 
     const postBtnClick = () => {
-        const tempPostList = [...postList];
+        /*const tempPostList = [...postList];
         tempPostList.push({
             id: postList.length + 1,
             content: newPost.content,
             files: newPost.files,
         });
         setPostList(tempPostList);
-        setNewPost(newEmptyPost);
+        setNewPost(newEmptyPost);*/
     };
 
     const handleNewPostContentChange = (value: string) => {
@@ -51,9 +37,9 @@ function Home() {
                     handleNewPostContentChange={handleNewPostContentChange}
                     handleNewPostImagesChange={handleNewPostImagesChange}
             />
-            <Feed postList={postList}/>
+            <Feed />
         </>
     )
 }
 
-export default Home
+export default Home;

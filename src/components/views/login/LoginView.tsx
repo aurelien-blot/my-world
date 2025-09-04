@@ -1,25 +1,43 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import PrimaryBtn from "../../buttons/PrimaryBtn.tsx";
-import {useMutation, useQuery} from "@tanstack/react-query";
+import {useMutation} from "@tanstack/react-query";
 import {loginService} from "../../../services/api/loginService.ts";
 import type {LoginUserRequest} from "../../../models/Login/loginUserRequest.ts";
-import {testService} from "../../../services/api/testService.ts";
+import {errorService} from "../../../services/util/errorService.ts";
+import type {LoginUserResponse} from "../../../models/Login/loginUserResponse.ts";
+import {useAuth} from "../../contexts/useAuth.tsx";
+import type {AxiosError} from "axios";
+import {useNavigate} from "react-router-dom";
 
 function LoginView() {
 
-    const { data: testResponse, error, isLoading } = useQuery({
+   /* const { data: testResponse, error, isLoading } = useQuery({
         queryKey: ["test"],      // identifiant du cache
         queryFn: testService.test,
-    });
+    });*/
+    const { login } = useAuth();
+    const navigate = useNavigate();
 
     const loginMutation = useMutation({
         mutationFn: (loginRequest: LoginUserRequest) => loginService.login(loginRequest),
-        onSuccess: (user) => {
-            console.log("Utilisateur connecté :", user);
-            // TODO : sauvegarder token / rediriger
+        onSuccess: (loginResponse  : LoginUserResponse) => {
+            console.log("Utilisateur connecté :", loginResponse.user.username);
+            if(loginResponse.success){
+                login(loginResponse);
+                navigate("/");
+            }
+            else{
+                setErrorMsg(loginResponse.message);
+            }
         },
-        onError: () => {
-            setErrorMsg("Erreur de connexion");
+        onError: (error: AxiosError ) => {
+            //Si erreur 403 on gère manuellement
+            if(error.response && error.response.status === 403){
+                setErrorMsg("Identifiant ou mot de passe incorrect");
+            }
+            else{
+                errorService.showErrorInAlert(error);
+            }
         },
     });
 
@@ -28,10 +46,21 @@ function LoginView() {
     const [errorMsg, setErrorMsg] = useState('');
 
     const loginAttempt = () => {
-        console.log(testResponse, error, isLoading);
-        loginMutation.mutate({identifier, password});
-        setErrorMsg('Erreur de connexion');
-    }
+        setErrorMsg('');
+        loginMutation.mutate({ identifier, password });
+    };
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Enter") {
+                loginAttempt();
+            }
+        }
+
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [loginAttempt]);
+
     return (
         <div className="flex items-center justify-center min-h-screen">
             <div className="w-full max-w-md bg-gray-600 shadow-lg rounded-xl p-8">

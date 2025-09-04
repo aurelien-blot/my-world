@@ -1,26 +1,35 @@
 import {createContext, type ReactNode, useState} from "react";
+import type {User} from "../../models/User/user.ts";
+import type {LoginUserResponse} from "../../models/Login/loginUserResponse.ts";
 
 type AuthContextType = {
-    user: string | null;
-    login: (username: string) => void;
+    connectedUser: User | null;
+    login: (loginUserResponse: LoginUserResponse) => void;
     logout: () => void;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-    const [user, setUser] = useState<string | null>(null);
+export const AuthProvider = ({children}: { children: ReactNode }) => {
+    const [connectedUser, setConnectedUser] = useState<User | null>(() => {
+        const savedUser = localStorage.getItem("connectedUser");
+        return savedUser ? JSON.parse(savedUser) as User : null;
+    });
 
-    const login = (username: string) => {
-        setUser(username);
+    const login = (loginUserResponse: LoginUserResponse) => {
+        localStorage.setItem('token', loginUserResponse.token);
+        localStorage.setItem('connectedUser', JSON.stringify(loginUserResponse.user));
+        setConnectedUser(loginUserResponse.user);
     };
 
     const logout = () => {
-        setUser(null);
+        localStorage.removeItem('token');
+        localStorage.removeItem('connectedUser');
+        setConnectedUser(null);
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, logout }}>
+        <AuthContext.Provider value={{connectedUser, login, logout}}>
             {children}
         </AuthContext.Provider>
     );

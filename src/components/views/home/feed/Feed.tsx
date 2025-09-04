@@ -1,13 +1,27 @@
-import type {Post} from "../../../../models/Post/post.ts";
 import {useState} from "react";
 import FullScreenModal from "../../../modals/FullScreenModal.tsx";
 import Gallery from "./gallery/Gallery.tsx";
 import PostCard from "./PostCard/PostCard.tsx";
+import {postService} from "../../../../services/api/postService.ts";
+import {AxiosError} from "axios";
+import {errorService} from "../../../../services/util/errorService.ts";
+import {useQuery} from "@tanstack/react-query";
 
-function Feed({postList}: { postList: Post[] }) {
+function Feed() {
 
     const [selectedImages, setSelectedImages] = useState<File[]>();
     const [selectedImageIndex, setSelectedImageIndex] = useState<number>();
+
+
+    const { data: postList, error, isLoading } = useQuery({
+        queryKey: ["postList"],      // identifiant du cache
+        queryFn: postService.getAll,
+    })
+
+    if(error){
+        errorService.showErrorInAlert(error as AxiosError);
+    }
+    console.log(isLoading); //TODO GERER
 
     const openImagesModal = (files: File[], index: number) => {
         setSelectedImages(files);
@@ -18,10 +32,15 @@ function Feed({postList}: { postList: Post[] }) {
         setSelectedImages([]);
     }
 
-    const postEltList = postList.map((post) => (
+    if (!postList || postList.length === 0) {
+        return <p>Aucun post disponible</p>;
+    }
+
+    const postEltList = postList?.map((post) => (
                 <PostCard post={post} key={post.id} openImagesModal={openImagesModal} />
             )
         )
+        ??(<div>Aucun post disponible</div>)
     ;
 
     const modalContent = () => {

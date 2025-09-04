@@ -4,9 +4,9 @@ import type {JSX} from "react";
 
 export function PrivateRoute({children}: {children: JSX.Element}) {
 
-    const {user}  = useAuth();
+    const {connectedUser}  = useAuth();
 
-    if (!user) {
+    if (!connectedUser) {
         return <Navigate to="/login" replace />;
     }
 

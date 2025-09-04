@@ -1,7 +1,7 @@
 import { api } from "./http";
 import type {Post} from "../../models/Post/post.ts";
 
-const path = "/posts";
+const path = "/post";
 export const postService = {
 
     async getAll(): Promise<Post[]> {

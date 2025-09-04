@@ -15,7 +15,7 @@ function PostCard({post, openImagesModal}:{
                 <span className="text-xs">Le 05/08/2024 à 16h35</span>
             </div>
             <p className="">{post.content}</p>
-            {post.files.length > 0 &&
+            {post.files?.length > 0 &&
                 <div className={`mt-5 flex  ${post.files.length > 1 ? "overflow-x-scroll" : ""}`}>
                     {post.files.map((file, index) => (
                         <img key={index} src={URL.createObjectURL(file)} alt={"image_" + index}
