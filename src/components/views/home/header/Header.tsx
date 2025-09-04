@@ -31,7 +31,7 @@ function Header({postBtnClick, newPost, handleNewPostContentChange, handleNewPos
     return (
         <>
             <div className="flex">
-                <h1 className="flex-1 text-center p-4 ">Welcome to My World</h1>
+                <h1 className="flex-1 text-center p-4 text-2xl ">Welcome to My World</h1>
                 <PrimaryBtn label="Nouveau Post"
                             onClick={showNewPostArea}
                             icon={<Send className="h-4 w-4"/>}
