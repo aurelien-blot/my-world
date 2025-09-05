@@ -16,6 +16,13 @@ function Feed() {
     const { data: postList, error, isLoading } = useQuery({
         queryKey: ["postList"],      // identifiant du cache
         queryFn: postService.getAll,
+        select: (data) => {
+            return [...data].sort((a, b) => {
+                const dateA = a.creationTime ? new Date(a.creationTime).getTime() : 0;
+                const dateB = b.creationTime ? new Date(b.creationTime).getTime() : 0;
+                return dateB - dateA; // Tri décroissant
+            });
+        }
     })
 
     if(error){

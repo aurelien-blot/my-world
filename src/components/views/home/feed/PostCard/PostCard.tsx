@@ -1,5 +1,6 @@
 import {CircleUser} from "lucide-react";
 import type {Post} from "../../../../../models/Post/post.ts";
+import {dateService} from "../../../../../services/util/dateService.ts";
 
 function PostCard({post, openImagesModal}:{
     post : Post,
@@ -11,8 +12,8 @@ function PostCard({post, openImagesModal}:{
                 border rounded border-gray-300">
             <div className="flex space-x-2">
                 <CircleUser className="h-4 w-4"/>
-                <span className="text-xs">Aurélien </span>
-                <span className="text-xs">Le 05/08/2024 à 16h35</span>
+                <span className="text-xs">{post.creationBy!.username}</span>
+                <span className="text-xs">Le {dateService.formatDate(post.creationTime!)}</span>
             </div>
             <p className="">{post.content}</p>
             {post.files?.length > 0 &&

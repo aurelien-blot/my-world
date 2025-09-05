@@ -41,7 +41,7 @@ function LoginView() {
         },
     });
 
-    const [identifier, setIdentifier] = useState('');
+    const [identifier, setIdentifier] = useState('guest');
     const [password, setPassword] = useState('');
     const [errorMsg, setErrorMsg] = useState('');
 
@@ -71,6 +71,7 @@ function LoginView() {
                     <div className="flex flex-col items-start">
                         <label htmlFor="identifier" className="font-medium text-gray-300 mb-1">Nom d'utilisateur</label>
                         <input onChange={(e) => setIdentifier(e.target.value)}
+                               value={identifier}
                                type="text" name="identifier" id="identifier" placeholder="Nom d'utilisateur"
                                autoComplete="identifier"
                                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"

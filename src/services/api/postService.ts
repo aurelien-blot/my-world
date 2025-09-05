@@ -9,8 +9,8 @@ export const postService = {
         return res.data;
     },
 
-    async create(post: Omit<Post, "id">): Promise<Post> {
-        const res = await api.post<Post>(path, post);
+    async create(body: Post): Promise<Post> {
+        const res = await api.post<Post>(path, body);
         return res.data;
     },
 
