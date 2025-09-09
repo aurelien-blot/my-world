@@ -1,7 +1,7 @@
 import type {ReactNode} from "react";
 import CustomBtn from "./CustomBtn.tsx";
 
-function PrimaryBtn({label, icon, onClick, extraClass, tooltip, submit, disabled, resize =true}:
+function DangerBtn({label, icon, onClick, extraClass, tooltip, submit, disabled, resize =true}:
                     {
                         label?: string,
                         icon?: ReactNode,
@@ -20,7 +20,7 @@ function PrimaryBtn({label, icon, onClick, extraClass, tooltip, submit, disabled
                    labelClass={labelClass}
                    icon={icon && <span>{icon}</span>}
                    onClick={onClick}
-                   extraClass={`bg-blue-500 text-white rounded p-2 ${extraClass}`}
+                   extraClass={`bg-red-500 text-white rounded p-2  ${extraClass}`}
                    tooltip={tooltip} submit={submit}
                    disabled={disabled}
 
@@ -28,4 +28,4 @@ function PrimaryBtn({label, icon, onClick, extraClass, tooltip, submit, disabled
     )
 }
 
-export default PrimaryBtn;
+export default DangerBtn;

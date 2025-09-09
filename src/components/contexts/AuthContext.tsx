@@ -4,6 +4,7 @@ import type {LoginUserResponse} from "../../models/Login/loginUserResponse.ts";
 
 type AuthContextType = {
     connectedUser: User | null;
+    isAdmin: boolean;
     login: (loginUserResponse: LoginUserResponse) => void;
     logout: () => void;
 };
@@ -16,20 +17,24 @@ export const AuthProvider = ({children}: { children: ReactNode }) => {
         return savedUser ? JSON.parse(savedUser) as User : null;
     });
 
+    const[isAdmin, setIsAdmin] = useState<boolean>(connectedUser!=null && connectedUser.username === "admin");
+
     const login = (loginUserResponse: LoginUserResponse) => {
         localStorage.setItem('token', loginUserResponse.token);
         localStorage.setItem('connectedUser', JSON.stringify(loginUserResponse.user));
         setConnectedUser(loginUserResponse.user);
+        setIsAdmin(loginUserResponse.user!=null && loginUserResponse.user.username === "admin");
     };
 
     const logout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('connectedUser');
         setConnectedUser(null);
+        setIsAdmin(false);
     };
 
     return (
-        <AuthContext.Provider value={{connectedUser, login, logout}}>
+        <AuthContext.Provider value={{connectedUser, isAdmin,  login, logout}}>
             {children}
         </AuthContext.Provider>
     );

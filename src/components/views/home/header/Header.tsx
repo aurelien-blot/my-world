@@ -1,7 +1,7 @@
 import {Send} from "lucide-react"
 import {type FormEvent, useState} from "react";
 import PrimaryBtn from "../../../buttons/PrimaryBtn.tsx";
-import NewPostForm from "./NewPost/NewPostForm.tsx";
+import PostForm from "./Post/PostForm.tsx";
 import type {Post} from "../../../../models/Post/post.ts";
 import {useAuth} from "../../../contexts/useAuth.tsx";
 import {useMutation, useQueryClient} from "@tanstack/react-query";
@@ -12,7 +12,7 @@ import {errorService} from "../../../../services/util/errorService.ts";
 function Header() {
     const queryClient = useQueryClient();
     const [isNewPostAreaVisible, setIsNewPostAreaVisible] = useState(false);
-    const { connectedUser } = useAuth();
+    const { connectedUser, isAdmin } = useAuth();
     const newEmptyPost = {content: "", files: [] as File[], creationBy: connectedUser!};
 
     const [newPost, setNewPost] = useState<Post>(newEmptyPost);
@@ -28,8 +28,6 @@ function Header() {
         },
     });
 
-    const isAdmin = connectedUser!.username==="admin";
-
     const postBtnClick = () => {
         postCreation.mutate(newPost);
     };
@@ -39,8 +37,8 @@ function Header() {
     };
 
     const hideNewPostArea = () => {
-        handleNewPostContentChange("");
-        handleNewPostImagesChange([]);
+        handlePostContentChange("");
+        handlePostImagesChange([]);
         setIsNewPostAreaVisible(false);
     };
 
@@ -50,13 +48,13 @@ function Header() {
         setIsNewPostAreaVisible(false);
     };
 
-    const handleNewPostContentChange = (value: string) => {
+    const handlePostContentChange = (value: string) => {
         const tempPost = {...newPost};
         tempPost.content = value;
         setNewPost(tempPost);
     };
 
-    const handleNewPostImagesChange = (value: File[]) => {
+    const handlePostImagesChange = (value: File[]) => {
         const tempPost = {...newPost};
         tempPost.files = value;
         setNewPost(tempPost);
@@ -68,13 +66,13 @@ function Header() {
                 {isAdmin && <PrimaryBtn label="Nouveau Post"
                             onClick={showNewPostArea}
                             icon={<Send className="h-4 w-4"/>}
-                            extraClass="fixed right-10 mt-4 md:mt-2 "
+                            extraClass="fixed right-10 m-2 mt-4 md:mt-2 "
                 />}
             </div>
             <div className={isNewPostAreaVisible ? "block p-4 " : "hidden"}>
-                <NewPostForm onSubmit={onSubmitForm} newPost={newPost} onCancel={hideNewPostArea}
-                             handleNewPostContentChange={handleNewPostContentChange}
-                             handleNewPostImagesChange={handleNewPostImagesChange}  />
+                <PostForm onSubmit={onSubmitForm} post={newPost} onCancel={hideNewPostArea}
+                             handlePostContentChange={handlePostContentChange}
+                             handlePostImagesChange={handlePostImagesChange}  />
             </div>
         </>
     );

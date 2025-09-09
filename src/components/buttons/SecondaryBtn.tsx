@@ -16,7 +16,7 @@ function SecondaryBtn({label, icon, onClick, extraClass, tooltip, submit, disabl
                    labelClass="hidden md:inline"
                    icon={icon && <span>{icon}</span>}
                    onClick={onClick}
-                   extraClass={`bg-gray-500 rounded p-2 m-2 ${extraClass}`}
+                   extraClass={`bg-gray-500 rounded p-2 ${extraClass}`}
                    tooltip={tooltip} submit={submit}
                    disabled={disabled}
 

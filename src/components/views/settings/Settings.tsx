@@ -12,7 +12,7 @@ function Settings() {
         <>
             <h1 className="mb-10">Paramètres</h1>
             <div className="flex justify-center">
-                <PrimaryBtn label="Se déconnecter" onClick={handleLogout} />
+                <PrimaryBtn label="Se déconnecter" extraClass="m-2 " onClick={handleLogout} resize={false}/>
             </div>
         </>
     )

@@ -26,6 +26,29 @@ export const postService = {
         });
 
         return res.data;
+    },
+
+    async update(post: Post, files: File[]): Promise<Post> {
+        const formData = new FormData();
+        formData.append(
+            "post",
+            new Blob([JSON.stringify(post)], {type: "application/json"})
+        );
+        if(files!=null && files.length>0){
+            files.forEach((file) => {
+                formData.append("files", file);
+            });
+        }
+
+        const res = await api.put<Post>(path+"/"+post.id, formData, {
+            headers: {"Content-Type": "multipart/form-data"},
+        });
+
+        return res.data;
+    },
+
+    async delete(postId: number): Promise<void> {
+        await api.delete<void>(`${path}/${postId}`);
     }
 
 };

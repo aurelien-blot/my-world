@@ -92,7 +92,7 @@ function LoginView() {
 
                     <div className="flex justify-center">
                         <PrimaryBtn onClick={loginAttempt} label="Se connecter"
-                                    extraClass=""
+                                    extraClass="m-2 "
                                     tooltip="Se connecter" resize={false}/>
                     </div>
                 </form>

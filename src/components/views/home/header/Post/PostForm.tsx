@@ -6,12 +6,13 @@ import MinorBtn from "../../../../buttons/MinorBtn.tsx";
 import {type ChangeEvent, type FormEvent, useRef, useState} from "react";
 import type {Post} from "../../../../../models/Post/post.ts";
 import SecondaryBtn from "../../../../buttons/SecondaryBtn.tsx";
+import {errorService} from "../../../../../services/util/errorService.ts";
 
-function NewPostForm({onSubmit, newPost, handleNewPostContentChange, handleNewPostImagesChange, onCancel}: {
+function PostForm({onSubmit, post, handlePostContentChange, handlePostImagesChange, onCancel}: {
     onSubmit: (event: FormEvent) => void,
-    newPost: Post,
-    handleNewPostContentChange: (value: string) => void,
-    handleNewPostImagesChange: (value: File[]) => void,
+    post: Post,
+    handlePostContentChange: (value: string) => void,
+    handlePostImagesChange: (value: File[]) => void,
     onCancel: () => void
 }) {
 
@@ -23,32 +24,54 @@ function NewPostForm({onSubmit, newPost, handleNewPostContentChange, handleNewPo
         setPreviews([]);
         fileInputRef.current!.value = "";
     }
+
+    const checkFileListSize = (files: FileList) :boolean => {
+        const maxFileSizeMB = import.meta.env.VITE_PICTURE_MAX_SIZE;
+        const maxFileListSize = import.meta.env.VITE_PICTURE_MAX_TOTAL_SIZE;
+        console.log(maxFileSizeMB);
+        let totalSize = 0;
+        for (const file of files) {
+            if(file.size > (maxFileSizeMB * 1024 * 1024)){
+                errorService.showErrorInAlert(new Error(`La taille maximale par image est de ${maxFileSizeMB} Mo`));
+                return false;
+            }
+            totalSize += file.size;
+        }
+        if(totalSize > maxFileListSize * 1024 * 1024){
+            errorService.showErrorInAlert(new Error(`La taille maximale totale des images est de ${maxFileListSize} Mo`));
+            return false;
+        }
+        return true;
+    }
     const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
         if (event.target.files) {
+            if(!checkFileListSize(event.target.files)){
+                return;
+            }
             const fileList = [] as File[];
             const filePreviewList = [];
             for (const file of event.target.files) {
                 fileList.push(file);
                 filePreviewList.push(URL.createObjectURL(file));
             }
-            handleNewPostImagesChange(fileList);
+            handlePostImagesChange(fileList);
             setPreviews(filePreviewList);
         } else {
-            handleNewPostImagesChange([]);
+            handlePostImagesChange([]);
         }
     };
     const addPicture = () => {
         fileInputRef.current?.click()
     };
 
-    const postDisabled = newPost.content.length === 0 && newPost.files.length === 0;
+    const postDisabled = post.content.length === 0 && post.files.length === 0;
 
     return (
         <>
             <div className="max-w-xl mx-auto">
                 <form onSubmit={handleSubmit}>
-                    <TextAreaInput name="newPostContentInput" value={newPost.content}
-                                   onChange={handleNewPostContentChange}/>
+                    <TextAreaInput name="postContentInput" value={post.content}
+                                   onChange={handlePostContentChange}/>
                     {previews.length > 0 &&
                         <div className="flex overflow-x-scroll">
                             {previews.map((img, index) => (
@@ -69,8 +92,8 @@ function NewPostForm({onSubmit, newPost, handleNewPostContentChange, handleNewPo
                     </div>
                     <div className="flex justify-center">
                         <PrimaryBtn label="Poster" icon={<Send className="h-4 w-4"/>} disabled={postDisabled}
-                                    submit={true}/>
-                        <SecondaryBtn label="Annuler" icon={<X className="h-4 w-4"/>} onClick={onCancel}
+                                    extraClass="m-2 " submit={true}/>
+                        <SecondaryBtn label="Annuler" extraClass="m-2 " icon={<X className="h-4 w-4"/>} onClick={onCancel}
                                     />
                     </div>
                 </form>
@@ -79,4 +102,4 @@ function NewPostForm({onSubmit, newPost, handleNewPostContentChange, handleNewPo
     );
 }
 
-export default NewPostForm;
+export default PostForm;
