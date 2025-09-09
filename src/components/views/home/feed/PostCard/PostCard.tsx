@@ -32,6 +32,7 @@ function PostCard({post, openPicturesModal}: {
                 <div className={`mt-5 flex  ${pictureList.length > 1 ? "overflow-x-scroll" : ""}`}>
                     {pictureList!.map((picture, index) => (
                         <PostCardPicture alt={"picture_" + index}
+                                         index={index}
                                          onClick={() => openPicturesModal(pictureList, index)}
                                          key={`${post.id}_${picture.id}`}
                                          filePath={picture.filePath!}

@@ -5,7 +5,7 @@ export const fileService = {
 
     async getPicture(filePath : string,signal?: AbortSignal): Promise<Blob> {
         const res = await api.get(path, {
-            params: { "filepath" : filePath },
+            params: { "filePath" : filePath },
             responseType: "blob",
             signal
         });

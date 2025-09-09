@@ -28,7 +28,6 @@ function Gallery({goToPreviousPicture, goToNextPicture, selectedPictures, select
                 if (aborted) return;
                 objectUrl = URL.createObjectURL(blob);
                 setSrc(objectUrl);
-                onLoaded?.(new File([blob], filePath.split("/").pop() ?? "image.jpg", {type: blob.type}));
             } catch {
                 /* ignore (abort/404) */
             }

@@ -1,7 +1,7 @@
 
 export interface PostPicture {
     id? : number
-    filepath: string
+    filePath: string
     filename: string
     file : File | null
 }

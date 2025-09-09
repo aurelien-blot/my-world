@@ -3,17 +3,19 @@ import NoPreview from "../../../../../assets/posts/no-preview.jpeg";
 import {fileService} from "../../../../../services/api/fileService.ts";
 
 function PostCardPicture({
+                             index,
                              filePath,                 // <- chemin vers ton endpoint (thumb)
                              alt,
                              className,
                              onClick,
                              onLoaded,                 // (optionnel) remonter le File/Blob au parent
                          }: {
+    index: number;
     filePath: string;
     alt?: string;
     className?: string;
     onClick?: () => void;
-    onLoaded?: (file: File) => void;
+    onLoaded?: (index : number, file: File) => void;
 }) {
     const imgRef = useRef<HTMLImageElement | null>(null);
     const [src, setSrc] = useState<string>(NoPreview);
@@ -29,7 +31,7 @@ function PostCardPicture({
                 if (aborted) return;
                 objectUrl = URL.createObjectURL(blob);
                 setSrc(objectUrl);
-                onLoaded?.(new File([blob], filePath.split("/").pop() ?? "image.jpg", {type: blob.type}));
+                onLoaded?.(index, new File([blob], filePath.split("/").pop() ?? "image.jpg", {type: blob.type}));
             } catch {
                 /* ignore (abort/404) */
             }
@@ -52,7 +54,7 @@ function PostCardPicture({
             if (objectUrl) URL.revokeObjectURL(objectUrl);
             io.disconnect();
         };
-    }, [filePath, onLoaded]);
+    }, [filePath, index]);
 
     return (
         <img
