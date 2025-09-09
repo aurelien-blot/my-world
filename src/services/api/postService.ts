@@ -9,9 +9,23 @@ export const postService = {
         return res.data;
     },
 
-    async create(body: Post): Promise<Post> {
-        const res = await api.post<Post>(path, body);
+    async create(post: Post, files: File[]): Promise<Post> {
+        const formData = new FormData();
+        formData.append(
+            "post",
+            new Blob([JSON.stringify(post)], {type: "application/json"})
+        );
+        if(files!=null && files.length>0){
+            files.forEach((file) => {
+                formData.append("files", file);
+            });
+        }
+
+        const res = await api.post<Post>(path, formData, {
+            headers: {"Content-Type": "multipart/form-data"},
+        });
+
         return res.data;
-    },
+    }
 
 };

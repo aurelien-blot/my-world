@@ -1,4 +1,4 @@
-import {useState} from "react";
+import { useState} from "react";
 import FullScreenModal from "../../../modals/FullScreenModal.tsx";
 import Gallery from "./gallery/Gallery.tsx";
 import PostCard from "./PostCard/PostCard.tsx";
@@ -6,16 +6,18 @@ import {postService} from "../../../../services/api/postService.ts";
 import {AxiosError} from "axios";
 import {errorService} from "../../../../services/util/errorService.ts";
 import {useQuery} from "@tanstack/react-query";
+import type {PostPicture} from "../../../../models/Post/postPicture.ts";
+
 
 function Feed() {
 
-    const [selectedImages, setSelectedImages] = useState<File[]>();
-    const [selectedImageIndex, setSelectedImageIndex] = useState<number>();
-
+    const [selectedPictures, setSelectedPictures] = useState<PostPicture[]>();
+    const [selectedPictureIndex, setSelectedPictureIndex] = useState<number>()
 
     const { data: postList, error, isLoading } = useQuery({
         queryKey: ["postList"],      // identifiant du cache
         queryFn: postService.getAll,
+        refetchOnWindowFocus: false,
         select: (data) => {
             return [...data].sort((a, b) => {
                 const dateA = a.creationTime ? new Date(a.creationTime).getTime() : 0;
@@ -30,13 +32,13 @@ function Feed() {
     }
     console.log(isLoading); //TODO GERER
 
-    const openImagesModal = (files: File[], index: number) => {
-        setSelectedImages(files);
-        setSelectedImageIndex(index);
+    const openPicturesModal = (postPictures: PostPicture[], index: number) => {
+        setSelectedPictures(postPictures);
+        setSelectedPictureIndex(index);
     }
 
-    const hideImagesModal = () => {
-        setSelectedImages([]);
+    const hidePicturesModal = () => {
+        setSelectedPictures([]);
     }
 
     if (!postList || postList.length === 0) {
@@ -44,7 +46,7 @@ function Feed() {
     }
 
     const postEltList = postList?.map((post) => (
-                <PostCard post={post} key={post.id} openImagesModal={openImagesModal} />
+                <PostCard post={post} key={post.id} openPicturesModal={openPicturesModal} />
             )
         )
         ??(<div>Aucun post disponible</div>)
@@ -52,25 +54,25 @@ function Feed() {
 
     const modalContent = () => {
 
-        if (selectedImages == null || selectedImages.length == 0 || selectedImageIndex == null) {
+        if (selectedPictures == null || selectedPictures.length == 0 || selectedPictureIndex == null) {
             return (<div>Aucune photo disponible</div>);
         } else {
-
-            const goToPreviousImage = () => {
-                if (selectedImageIndex > 0) {
-                    setSelectedImageIndex(selectedImageIndex - 1);
+            const goToPreviousPicture = () => {
+                if (selectedPictureIndex > 0) {
+                    setSelectedPictureIndex(selectedPictureIndex - 1);
                 }
             }
 
-            const goToNextImage = () => {
-                if (selectedImageIndex < (selectedImages.length - 1)) {
-                    setSelectedImageIndex(selectedImageIndex + 1);
+            const goToNextPicture = () => {
+                if (selectedPictureIndex < (selectedPictures.length - 1)) {
+                    setSelectedPictureIndex(selectedPictureIndex + 1);
                 }
             }
             return (
-                <Gallery goToPreviousImage={goToPreviousImage}
-                         goToNextImage={goToNextImage}
-                         selectedImages={selectedImages} selectedImageIndex={selectedImageIndex}/>
+                <Gallery
+                    goToPreviousPicture={goToPreviousPicture}
+                         goToNextPicture={goToNextPicture}
+                         selectedPictures={selectedPictures} selectedPictureIndex={selectedPictureIndex}/>
             );
         }
     }
@@ -80,8 +82,8 @@ function Feed() {
             <div className="block p-4">
                 <div>{postEltList}</div>
             </div>
-            {selectedImages != null && selectedImages.length > 0 &&
-                <FullScreenModal close={hideImagesModal} content={modalContent()}/>
+            {selectedPictures != null && selectedPictures.length > 0 &&
+                <FullScreenModal close={hidePicturesModal} content={modalContent()}/>
             }
         </>
 

@@ -18,7 +18,7 @@ function Header() {
     const [newPost, setNewPost] = useState<Post>(newEmptyPost);
 
     const postCreation = useMutation({
-        mutationFn: (newPost: Post) => postService.create(newPost),
+        mutationFn: (newPost: Post) => postService.create(newPost, newPost.files),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["postList"] });
             setNewPost({content: "", files: [] as File[], creationBy: connectedUser!});
