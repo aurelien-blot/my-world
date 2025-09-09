@@ -28,7 +28,6 @@ function PostForm({onSubmit, post, handlePostContentChange, handlePostImagesChan
     const checkFileListSize = (files: FileList) :boolean => {
         const maxFileSizeMB = import.meta.env.VITE_PICTURE_MAX_SIZE;
         const maxFileListSize = import.meta.env.VITE_PICTURE_MAX_TOTAL_SIZE;
-        console.log(maxFileSizeMB);
         let totalSize = 0;
         for (const file of files) {
             if(file.size > (maxFileSizeMB * 1024 * 1024)){

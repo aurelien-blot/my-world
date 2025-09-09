@@ -65,7 +65,7 @@ function Feed() {
             await queryClient.cancelQueries({queryKey: ["postList"]});
             const previous = queryClient.getQueryData<Post[]>(["postList"]);
             queryClient.setQueryData<Post[]>(["postList"], (old) =>
-                (old ?? []).map(p => p.id === post.id ? {...p, ...post} : p)
+                (old ?? []).map(p => p.id === post.id ? {...post} : p)
             );
             return {previous};
         },
@@ -92,8 +92,13 @@ function Feed() {
         return <p>Aucun post disponible</p>;
     }
 
+    const picturesVersion = (post: Post) =>
+        (post.pictureList ?? [])
+            .map(pic => `${pic.id}:${post.pictureList?.length}`)
+            .join('|');
+
     const postEltList = postList?.map((post) => (
-                    <PostCard post={post} key={post.id}
+                    <PostCard post={post}  key={`${post.id}-${picturesVersion(post)}`}
                               openPicturesModal={openPicturesModal}
                               onUpdatePostFct={updatePost} onDeletePostFct={deletePost}/>
                 )

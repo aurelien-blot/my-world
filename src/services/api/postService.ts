@@ -49,6 +49,10 @@ export const postService = {
 
     async delete(postId: number): Promise<void> {
         await api.delete<void>(`${path}/${postId}`);
+    },
+
+    async deletePostPicture(postId: number, pictureId: number): Promise<void> {
+        await api.delete<void>(`${path}/pic/${postId}/${pictureId}`);
     }
 
 };

@@ -9,6 +9,10 @@ import DangerBtn from "../../../../buttons/DangerBtn.tsx";
 import PrimaryBtn from "../../../../buttons/PrimaryBtn.tsx";
 import PostForm from "../../header/Post/PostForm.tsx";
 import * as React from "react";
+import {useMutation} from "@tanstack/react-query";
+import {postService} from "../../../../../services/api/postService.ts";
+import {AxiosError} from "axios";
+import {errorService} from "../../../../../services/util/errorService.ts";
 
 function PostCard({post, openPicturesModal, onDeletePostFct, onUpdatePostFct}: {
     post: Post,
@@ -28,6 +32,14 @@ function PostCard({post, openPicturesModal, onDeletePostFct, onUpdatePostFct}: {
     const handleLoaded = useCallback((index: number, file: File) => {
         setPictureList(prev => prev.map((p, i) => (i === index ? { ...p, file } : p)));
     }, []);
+
+    const deletePostPictureCall = useMutation({
+        mutationFn: (requestParams: {postId :number, pictureId : number}) => postService.deletePostPicture(requestParams.postId, requestParams.pictureId),
+        onError: (error: AxiosError,) => {
+            errorService.showErrorInAlert(error);
+        },
+    });
+
 
     const deletePostFct = () => {
         //Dialog box
@@ -70,6 +82,18 @@ function PostCard({post, openPicturesModal, onDeletePostFct, onUpdatePostFct}: {
         }
     };
 
+    const onDeletePostPictureFct = (index: number) => {
+        if(pictureList[index]==null){
+            return;
+        }
+        const requestParams = {
+            postId: post.id!,
+            pictureId: pictureList[index].id!
+        }
+        deletePostPictureCall.mutate(requestParams);
+        //On retire l'image de la liste
+        setPictureList(prev => prev.filter((_, i) => i !== index));
+    }
     return (
         <div key={post.id} className="max-w-xl mx-auto pl-4 pr-4 pt-1 pb-4
                 mb-3 bg-blue-50 text-black
@@ -110,6 +134,7 @@ function PostCard({post, openPicturesModal, onDeletePostFct, onUpdatePostFct}: {
                                          onClick={() => openPicturesModal(pictureList, index)}
                                          key={`${post.id}_${picture.id}`}
                                          filePath={picture.filePath!}
+                                         onDeletePostPictureFct={onDeletePostPictureFct}
                                          className="max-h-[15rem] object-contain rounded mr-2 hover:cursor-pointer"
                                          onLoaded={handleLoaded}/>
                     ))}

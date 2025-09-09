@@ -1,6 +1,9 @@
 import {useEffect, useRef, useState} from "react";
 import NoPreview from "../../../../../assets/posts/no-preview.jpeg";
 import {fileService} from "../../../../../services/api/fileService.ts";
+import {useAuth} from "../../../../contexts/useAuth.tsx";
+import {Trash} from "lucide-react";
+import DangerBtn from "../../../../buttons/DangerBtn.tsx";
 
 function PostCardPicture({
                              index,
@@ -8,17 +11,25 @@ function PostCardPicture({
                              alt,
                              className,
                              onClick,
-                             onLoaded,                 // (optionnel) remonter le File/Blob au parent
+                             onLoaded,
+                             onDeletePostPictureFct// (optionnel) remonter le File/Blob au parent
                          }: {
     index: number;
     filePath: string;
     alt?: string;
     className?: string;
     onClick?: () => void;
-    onLoaded?: (index : number, file: File) => void;
+    onLoaded?: (index: number, file: File) => void;
+    onDeletePostPictureFct: (index : number) => void;
 }) {
     const imgRef = useRef<HTMLImageElement | null>(null);
     const [src, setSrc] = useState<string>(NoPreview);
+    const {isAdmin} = useAuth();
+    const deletePostPictureFct = () => {
+        if (window.confirm("Êtes-vous sûr de vouloir supprimer cette image ?")) {
+            onDeletePostPictureFct(index);
+        }
+    }
 
     useEffect(() => {
         let started = false;
@@ -44,7 +55,7 @@ function PostCardPicture({
                 load();
                 io.disconnect();
             }
-        }, { rootMargin: "200px" });
+        }, {rootMargin: "200px"});
 
         if (el) io.observe(el);
 
@@ -57,15 +68,37 @@ function PostCardPicture({
     }, [filePath, index]);
 
     return (
-        <img
-            ref={imgRef}
-            src={src}
-            alt={alt ?? ""}
-            className={className}
-            loading="lazy"
-            draggable={false}
-            onClick={onClick}
-        />
+        <div className="relative inline-block group">
+            {isAdmin && (
+                <div
+                    className="
+          absolute top-2 right-2 z-10
+          opacity-0 group-hover:opacity-100
+          pointer-events-none group-hover:pointer-events-auto
+          transition-opacity duration-150
+        "
+                >
+                    <DangerBtn
+                        onClick={deletePostPictureFct}
+                        icon={<Trash className="h-3 w-3" />}
+                        tooltip="Supprimer l'image"
+                        label=""
+                        extraClass=""
+                    />
+                </div>
+            )}
+
+            <img
+                ref={imgRef}
+                src={src}
+                alt={alt ?? ""}
+                className={`block ${className ?? ""}`}
+                loading="lazy"
+                draggable={false}
+                onClick={onClick}
+            />
+        </div>
     );
 }
+
 export default PostCardPicture;
