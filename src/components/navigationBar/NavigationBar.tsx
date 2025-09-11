@@ -9,10 +9,10 @@ function NavigationBar() {
     const activeClass = "bg-white text-gray-800 ";
     const hoverClass = "hover:bg-gray-600 ";
     const baseLinkClass = "flex items-center space-x-2 flex-1 justify-center p-2 h-10 " + hoverClass
-
+    const navClass = "fixed left-0 right-0 flex justify-around md:bottom-auto md:top-0 bottom-0 "
+    //const navClass="flex shrink-0 ";
     return (
-        <nav className="fixed left-0 right-0 flex justify-around
-                    md:bottom-auto md:top-0 bottom-0 ">
+        <nav className={navClass}>
             <NavLink
                 to="/"
                 className={({isActive}) =>

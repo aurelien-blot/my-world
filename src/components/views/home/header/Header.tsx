@@ -61,12 +61,12 @@ function Header() {
     };
     return (
         <>
-            <div className="flex">
-                <h1 className="flex-1 text-center p-4 text-2xl ">Bienvenue sur My World</h1>
+            <div className="flex justify-around p-4 max-w-xl mx-auto mb-2">
+                <h1 className="text-2xl ">Bienvenue sur My World</h1>
                 {isAdmin && <PrimaryBtn label="Nouveau Post"
                             onClick={showNewPostArea}
                             icon={<Send className="h-4 w-4"/>}
-                            extraClass="fixed right-10 m-2 mt-4 md:mt-2 "
+                            extraClass=""
                 />}
             </div>
             <div className={isNewPostAreaVisible ? "block p-4 " : "hidden"}>

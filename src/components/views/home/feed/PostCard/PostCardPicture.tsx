@@ -4,6 +4,7 @@ import {fileService} from "../../../../../services/api/fileService.ts";
 import {useAuth} from "../../../../contexts/useAuth.tsx";
 import {Trash} from "lucide-react";
 import DangerBtn from "../../../../buttons/DangerBtn.tsx";
+import {useLongPress} from "../../../../hooks/useLongPress.ts";
 
 function PostCardPicture({
                              index,
@@ -20,16 +21,23 @@ function PostCardPicture({
     className?: string;
     onClick?: () => void;
     onLoaded?: (index: number, file: File) => void;
-    onDeletePostPictureFct: (index : number) => void;
+    onDeletePostPictureFct: (index: number) => void;
 }) {
     const imgRef = useRef<HTMLImageElement | null>(null);
     const [src, setSrc] = useState<string>(NoPreview);
+    const [showActions, setShowActions] = useState(false);
     const {isAdmin} = useAuth();
     const deletePostPictureFct = () => {
         if (window.confirm("Êtes-vous sûr de vouloir supprimer cette image ?")) {
             onDeletePostPictureFct(index);
         }
     }
+
+    const longPressHandlers = useLongPress(
+        () => setShowActions(true),
+        () => onClick?.(),
+        { delay: 500 }
+    );
 
     useEffect(() => {
         let started = false;
@@ -68,19 +76,15 @@ function PostCardPicture({
     }, [filePath, index]);
 
     return (
-        <div className="relative inline-block group">
+        <div className="relative inline-block group" onClick={() => setShowActions(prev => !prev)}>
             {isAdmin && (
-                <div
-                    className="
-          absolute top-2 right-2 z-10
-          opacity-0 group-hover:opacity-100
-          pointer-events-none group-hover:pointer-events-auto
-          transition-opacity duration-150
-        "
-                >
+                <div className={` absolute top-2 right-4 z-10
+                ${showActions ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none md:group-hover:opacity-100 md:group-hover:pointer-events-auto"}
+                          transition-opacity duration-150
+                        `}>
                     <DangerBtn
                         onClick={deletePostPictureFct}
-                        icon={<Trash className="h-3 w-3" />}
+                        icon={<Trash className="h-3 w-3"/>}
                         tooltip="Supprimer l'image"
                         label=""
                         extraClass=""
@@ -96,6 +100,7 @@ function PostCardPicture({
                 loading="lazy"
                 draggable={false}
                 onClick={onClick}
+                {...longPressHandlers}
             />
         </div>
     );

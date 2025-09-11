@@ -1,4 +1,3 @@
-import './App.css'
 import { Routes, Route, Outlet } from "react-router-dom";
 import Home from "../views/home/Home.tsx";
 import Profile from "../views/profile/Profile.tsx";
@@ -9,12 +8,12 @@ import LoginView from "../views/login/LoginView.tsx";
 
 function Layout() {
     return (
-        <>
-            <NavigationBar /> {/* affiché une seule fois */}
-            <div className="md:mt-10 mainContent">
-                <Outlet /> {/* ici s’affichent les pages */}
+        <div className="flex flex-col h-screen">
+            <NavigationBar />
+            <div className="mt-0 md:mt-10 mb-10 md:mb-0 flex-1 overflow-auto">
+                <Outlet />
             </div>
-        </>
+        </div>
     );
 }
 

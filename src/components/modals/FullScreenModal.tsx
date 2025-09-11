@@ -21,14 +21,14 @@ function FullScreenModal({close, content, canClose = true}: {
     }, [canClose, close])
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-80 z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-80 z-[500]">
             {canClose &&
                 <div className="flex">
                     <CloseModalBtn onClose={close}/>
                 </div>
             }
 
-            <div className="flex max-h-full max-w-full pt-12 pb-12 ">
+            <div className="flex h-full w-full pt-12 pb-12 ">
                 {content}
             </div>
 

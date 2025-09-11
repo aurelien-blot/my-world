@@ -8,6 +8,7 @@ import {errorService} from "../../../../services/util/errorService.ts";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import type {PostPicture} from "../../../../models/Post/postPicture.ts";
 import type {Post} from "../../../../models/Post/post.ts";
+import LoaderComponent from "../../../util/LoaderComponent.tsx";
 
 
 function Feed() {
@@ -33,7 +34,6 @@ function Feed() {
     if (error) {
         errorService.showErrorInAlert(error as AxiosError);
     }
-    console.log(isLoading); //TODO GERER
 
     const openPicturesModal = (postPictures: PostPicture[], index: number) => {
         setSelectedPictures(postPictures);
@@ -98,7 +98,7 @@ function Feed() {
             .join('|');
 
     const postEltList = postList?.map((post) => (
-                    <PostCard post={post}  key={`${post.id}-${picturesVersion(post)}`}
+                    <PostCard post={post} key={`${post.id}-${picturesVersion(post)}`}
                               openPicturesModal={openPicturesModal}
                               onUpdatePostFct={updatePost} onDeletePostFct={deletePost}/>
                 )
@@ -108,39 +108,44 @@ function Feed() {
 
     const modalContent = () => {
 
-        if (selectedPictures == null || selectedPictures.length == 0 || selectedPictureIndex == null) {
-            return (<div>Aucune photo disponible</div>);
-        } else {
-            const goToPreviousPicture = () => {
-                if (selectedPictureIndex > 0) {
-                    setSelectedPictureIndex(selectedPictureIndex - 1);
-                }
+        const noPostPictures = selectedPictures == null || selectedPictures.length == 0 || selectedPictureIndex == null;
+        const goToPreviousPicture = () => {
+            if (selectedPictureIndex! > 0) {
+                setSelectedPictureIndex(selectedPictureIndex! - 1);
             }
-
-            const goToNextPicture = () => {
-                if (selectedPictureIndex < (selectedPictures.length - 1)) {
-                    setSelectedPictureIndex(selectedPictureIndex + 1);
-                }
-            }
-            return (
-                <Gallery
-                    goToPreviousPicture={goToPreviousPicture}
-                    goToNextPicture={goToNextPicture}
-                    selectedPictures={selectedPictures} selectedPictureIndex={selectedPictureIndex}/>
-            );
         }
+
+        const goToNextPicture = () => {
+            if (selectedPictureIndex! < (selectedPictures!.length - 1)) {
+                setSelectedPictureIndex(selectedPictureIndex! + 1);
+            }
+        }
+
+        return (
+            <>
+                {noPostPictures && <div>Aucune photo disponible</div>}
+                {!noPostPictures &&
+                    <Gallery
+                        goToPreviousPicture={goToPreviousPicture}
+                        goToNextPicture={goToNextPicture}
+                        selectedPictures={selectedPictures!} selectedPictureIndex={selectedPictureIndex!}/>
+                }
+            </>
+        );
     }
 
     return (
-        <>
-            <div className="block p-4">
-                <div>{postEltList}</div>
-            </div>
+        <div className="h-[calc(100vh-7rem)] md:h-[calc(100vh-8rem)] overflow-auto">
+            {isLoading && <LoaderComponent/>}
+            {!isLoading &&
+                <div className="block p-4">
+                    <div>{postEltList}</div>
+                </div>
+            }
             {selectedPictures != null && selectedPictures.length > 0 &&
                 <FullScreenModal close={hidePicturesModal} content={modalContent()}/>
             }
-        </>
-
+        </div>
     );
 }
 
