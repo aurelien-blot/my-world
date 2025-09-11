@@ -8,17 +8,25 @@ import {useMutation, useQueryClient} from "@tanstack/react-query";
 import {postService} from "../../../../services/api/postService.ts";
 import type {AxiosError} from "axios";
 import {errorService} from "../../../../services/util/errorService.ts";
+import LoaderComponent from "../../../util/LoaderComponent.tsx";
 
 function Header() {
     const queryClient = useQueryClient();
     const [isNewPostAreaVisible, setIsNewPostAreaVisible] = useState(false);
     const { connectedUser, isAdmin } = useAuth();
     const newEmptyPost = {content: "", files: [] as File[], creationBy: connectedUser!};
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const [newPost, setNewPost] = useState<Post>(newEmptyPost);
 
     const postCreation = useMutation({
-        mutationFn: (newPost: Post) => postService.create(newPost, newPost.files),
+        mutationFn: (newPost: Post) =>{
+            setIsLoading(true);
+            return postService.create(newPost, newPost.files);
+        },
+        onSettled: () => {
+            setIsLoading(false);
+        },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["postList"] });
             setNewPost({content: "", files: [] as File[], creationBy: connectedUser!});
@@ -69,11 +77,15 @@ function Header() {
                             extraClass=""
                 />}
             </div>
-            <div className={isNewPostAreaVisible ? "block p-4 " : "hidden"}>
-                <PostForm onSubmit={onSubmitForm} post={newPost} onCancel={hideNewPostArea}
-                             handlePostContentChange={handlePostContentChange}
-                             handlePostImagesChange={handlePostImagesChange}  />
-            </div>
+            {isLoading  && <LoaderComponent/>}
+            {!isLoading &&
+                <div className={isNewPostAreaVisible ? "block p-4 " : "hidden"}>
+                    <PostForm onSubmit={onSubmitForm} post={newPost} onCancel={hideNewPostArea}
+                              handlePostContentChange={handlePostContentChange}
+                              handlePostImagesChange={handlePostImagesChange}  />
+                </div>
+            }
+
         </>
     );
 }

@@ -14,6 +14,7 @@ import LoaderComponent from "../../../util/LoaderComponent.tsx";
 function Feed() {
 
     const [selectedPictures, setSelectedPictures] = useState<PostPicture[]>();
+    const [isUpdateLoading, setIsUpdateLoading] = useState<boolean>(false);
     const [selectedPictureIndex, setSelectedPictureIndex] = useState<number>()
     const queryClient = useQueryClient();
 
@@ -62,6 +63,7 @@ function Feed() {
     const updatePostCall = useMutation({
         mutationFn: (post: Post) => postService.update(post, post.files ?? []),
         onMutate: async (post) => {
+            setIsUpdateLoading(true);
             await queryClient.cancelQueries({queryKey: ["postList"]});
             const previous = queryClient.getQueryData<Post[]>(["postList"]);
             queryClient.setQueryData<Post[]>(["postList"], (old) =>
@@ -75,6 +77,7 @@ function Feed() {
         },
         onSettled: () => {
             queryClient.invalidateQueries({queryKey: ["postList"]});
+            setIsUpdateLoading(false);
         },
     });
 
@@ -82,7 +85,7 @@ function Feed() {
         deletePostCall.mutate(postId)
     }
     const updatePost = (post: Post) => {
-        updatePostCall.mutate(post)
+        updatePostCall.mutate(post);
     }
     const hidePicturesModal = () => {
         setSelectedPictures([]);
@@ -136,8 +139,8 @@ function Feed() {
 
     return (
         <div className="h-[calc(100vh-7rem)] md:h-[calc(100vh-8rem)] overflow-auto">
-            {isLoading && <LoaderComponent/>}
-            {!isLoading &&
+            {(isLoading || isUpdateLoading) && <LoaderComponent/>}
+            {!isLoading && !isUpdateLoading &&
                 <div className="block p-4">
                     <div>{postEltList}</div>
                 </div>
