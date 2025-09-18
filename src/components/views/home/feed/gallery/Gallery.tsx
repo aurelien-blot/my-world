@@ -8,6 +8,7 @@ import {useSwipeable} from "react-swipeable";
 import DownloadBtn from "../../../../buttons/DownloadBtn.tsx";
 import {errorService} from "../../../../../services/util/errorService.ts";
 import {useMutation} from "@tanstack/react-query";
+import type {AxiosError} from "axios";
 
 function Gallery({goToPreviousPicture, goToNextPicture, selectedPictures, selectedPictureIndex}: {
     goToPreviousPicture: () => void,
@@ -42,7 +43,7 @@ function Gallery({goToPreviousPicture, goToNextPicture, selectedPictures, select
 
         const load = async () => {
             try {
-                const blob = await fileService.downloadResizedPicture(currentPicture.id, ac.signal);
+                const blob = await fileService.downloadResizedPicture(currentPicture.id!, ac.signal);
                 objectUrl = URL.createObjectURL(blob);
                 setSrc(objectUrl);
             } catch {
@@ -87,7 +88,7 @@ function Gallery({goToPreviousPicture, goToNextPicture, selectedPictures, select
             a.remove();
             setIsLoading(false);
         },
-        onError: (err: AxiosError | Error) => {
+        onError: (err: AxiosError) => {
             setIsLoading(false);
             errorService.showErrorInAlert(err);
         },
