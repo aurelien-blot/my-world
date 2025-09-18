@@ -133,9 +133,9 @@ function PostCard({post, openPicturesModal, onDeletePostFct, onUpdatePostFct}: {
                                          index={index}
                                          onClick={() => openPicturesModal(pictureList, index)}
                                          key={`${post.id}_${picture.id}`}
-                                         filePath={picture.filePath!}
+                                         picture={picture}
                                          onDeletePostPictureFct={onDeletePostPictureFct}
-                                         className="max-h-[15rem] object-contain rounded mr-2 hover:cursor-pointer"
+                                         className="max-h-[10rem] max-w-[10rem]  object-contain rounded mr-2 hover:cursor-pointer"
                                          onLoaded={handleLoaded}/>
                     ))}
                 </div>

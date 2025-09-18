@@ -5,6 +5,9 @@ import NoPreview from "../../../../../assets/posts/no-preview.jpeg";
 import {fileService} from "../../../../../services/api/fileService.ts";
 import LoaderComponent from "../../../../util/LoaderComponent.tsx";
 import {useSwipeable} from "react-swipeable";
+import DownloadBtn from "../../../../buttons/DownloadBtn.tsx";
+import {errorService} from "../../../../../services/util/errorService.ts";
+import {useMutation} from "@tanstack/react-query";
 
 function Gallery({goToPreviousPicture, goToNextPicture, selectedPictures, selectedPictureIndex}: {
     goToPreviousPicture: () => void,
@@ -39,7 +42,7 @@ function Gallery({goToPreviousPicture, goToNextPicture, selectedPictures, select
 
         const load = async () => {
             try {
-                const blob = await fileService.getPicture(currentPicture.filePath, ac.signal);
+                const blob = await fileService.downloadResizedPicture(currentPicture.id, ac.signal);
                 objectUrl = URL.createObjectURL(blob);
                 setSrc(objectUrl);
             } catch {
@@ -68,6 +71,31 @@ function Gallery({goToPreviousPicture, goToNextPicture, selectedPictures, select
             if (objectUrl) URL.revokeObjectURL(objectUrl);
         }
     }, [selectedPictureIndex, selectedPictures, goToPreviousPicture, goToNextPicture, currentPicture, isMoreThanOnePicture])
+
+    const downloadMutation = useMutation({
+        mutationFn: async () => {
+            setIsLoading(true);
+            const s = new AbortController().signal;
+            return await fileService.downloadOriginalPicture(currentPicture.id!, s);
+        },
+        onSuccess: (blob: Blob) => {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = currentPicture.filename;
+            a.click();
+            a.remove();
+            setIsLoading(false);
+        },
+        onError: (err: AxiosError | Error) => {
+            setIsLoading(false);
+            errorService.showErrorInAlert(err);
+        },
+    });
+
+    const downloadPicture = () => {
+        downloadMutation.mutate();
+    };
 
     return (
         <div className="h-full w-full">
@@ -103,6 +131,8 @@ function Gallery({goToPreviousPicture, goToNextPicture, selectedPictures, select
                     }
                 </div>
             }
+
+            <DownloadBtn onClick={downloadPicture}/>
         </div>
 
     )

@@ -5,10 +5,11 @@ import {useAuth} from "../../../../contexts/useAuth.tsx";
 import {Trash} from "lucide-react";
 import DangerBtn from "../../../../buttons/DangerBtn.tsx";
 import {useLongPress} from "../../../../hooks/useLongPress.ts";
+import type {PostPicture} from "../../../../../models/Post/postPicture.ts";
 
 function PostCardPicture({
                              index,
-                             filePath,                 // <- chemin vers ton endpoint (thumb)
+                             picture,                 // <- chemin vers ton endpoint (thumb)
                              alt,
                              className,
                              onClick,
@@ -16,7 +17,7 @@ function PostCardPicture({
                              onDeletePostPictureFct// (optionnel) remonter le File/Blob au parent
                          }: {
     index: number;
-    filePath: string;
+    picture: PostPicture;
     alt?: string;
     className?: string;
     onClick?: () => void;
@@ -46,11 +47,11 @@ function PostCardPicture({
         const ac = new AbortController();
         const load = async () => {
             try {
-                const blob = await fileService.getPicture(filePath, ac.signal);
+                const blob = await fileService.downloadMiniPicture(picture.id!, ac.signal);
                 if (aborted) return;
                 objectUrl = URL.createObjectURL(blob);
                 setSrc(objectUrl);
-                onLoaded?.(index, new File([blob], filePath.split("/").pop() ?? "image.jpg", {type: blob.type}));
+                onLoaded?.(index, new File([blob], picture.filename ?? "image.jpg", {type: blob.type}));
             } catch {
                 /* ignore (abort/404) */
             }
@@ -73,10 +74,10 @@ function PostCardPicture({
             if (objectUrl) URL.revokeObjectURL(objectUrl);
             io.disconnect();
         };
-    }, [filePath, index]);
+    }, [picture.id, index]);
 
     return (
-        <div className="relative inline-block group" onClick={() => setShowActions(prev => !prev)}>
+        <div className="relative group flex items-center justify-center" onClick={() => setShowActions(prev => !prev)}>
             {isAdmin && (
                 <div className={` absolute top-2 right-4 z-10
                 ${showActions ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none md:group-hover:opacity-100 md:group-hover:pointer-events-auto"}

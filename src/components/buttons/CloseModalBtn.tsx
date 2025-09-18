@@ -8,6 +8,8 @@ function CloseModalBtn({onClose}:
         <button
             onClick={onClose}
             className="absolute top-5 right-5 text-white hover:cursor-pointer"
+            aria-label="Fermer la fenêtre"
+            title="Fermer la fenêtre"
         >
             <X className="h-8 w-8" />
         </button>

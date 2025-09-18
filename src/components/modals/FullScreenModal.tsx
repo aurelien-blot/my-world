@@ -1,10 +1,11 @@
 import {type ReactNode, useEffect} from "react";
 import CloseModalBtn from "../buttons/CloseModalBtn.tsx";
 
-function FullScreenModal({close, content, canClose = true}: {
+function FullScreenModal({close, content, canClose = true, additionalButtons}: {
     close: () => void,
     content: ReactNode,
-    canClose?: boolean
+    canClose?: boolean,
+    additionalButtons?: ReactNode
 }) {
 
     useEffect(() => {
@@ -23,7 +24,8 @@ function FullScreenModal({close, content, canClose = true}: {
     return (
         <div className="fixed inset-0 bg-black bg-opacity-80 z-[500]">
             {canClose &&
-                <div className="flex">
+                <div className="flex space-x-12">
+                    {additionalButtons}
                     <CloseModalBtn onClose={close}/>
                 </div>
             }
