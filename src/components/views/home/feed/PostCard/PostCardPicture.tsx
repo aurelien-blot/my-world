@@ -124,6 +124,7 @@ function PostCardPicture({
              onPointerUp={onPointerUp}
              onPointerCancel={onPointerCancel}
              onClick={safeToggleActions}
+             onContextMenu={(e) => e.preventDefault()}
         >
             {isAdmin && (
                 <div className={` absolute top-2 right-4 z-10
@@ -148,6 +149,13 @@ function PostCardPicture({
                 loading="lazy"
                 draggable={false}
                 // mêmes gardes anti-faux-clic pour l'image
+                onContextMenu={(e) => e.preventDefault()}
+                onDragStart={(e) => e.preventDefault()}
+                style={{
+                    userSelect: 'none',
+                    WebkitUserSelect: 'none',
+                    WebkitTouchCallout: 'none', // iOS: empêche le menu "Enregistrer l’image"
+                }}
                 onClickCapture={cancelIfDragged}  // double filet de sécurité
                 onPointerDown={onPointerDown}
                 onPointerMove={onPointerMove}
