@@ -30,31 +30,40 @@ function PostCardPicture({
     const {isAdmin} = useAuth();
 
     // --- anti-faux-clic ---
-    const startPos = useRef<{x:number; y:number} | null>(null);
+    const start = useRef<{x:number; y:number} | null>(null);
     const moved = useRef(false);
-    const MOVE_THRESHOLD = 8; // px
+    const MOVE_PX = 8;
 
     const onPointerDown = (e: React.PointerEvent) => {
-        startPos.current = { x: e.clientX, y: e.clientY };
+        start.current = { x: e.clientX, y: e.clientY };
         moved.current = false;
     };
+
     const onPointerMove = (e: React.PointerEvent) => {
-        if (!startPos.current) return;
-        const dx = Math.abs(e.clientX - startPos.current.x);
-        const dy = Math.abs(e.clientY - startPos.current.y);
-        if (dx > MOVE_THRESHOLD || dy > MOVE_THRESHOLD) moved.current = true;
-    };
-    const onPointerUp = () => {
-        startPos.current = null;
+        if (!start.current) return;
+        const dx = Math.abs(e.clientX - start.current.x);
+        const dy = Math.abs(e.clientY - start.current.y);
+        if (dx > MOVE_PX || dy > MOVE_PX) moved.current = true;
     };
 
-    const safeClick = (cb?: () => void) => () => {
+    const onPointerUp = () => { start.current = null; };
+    const onPointerCancel = () => { moved.current = true; start.current = null; };
+
+    const cancelIfDragged = (e: React.SyntheticEvent) => {
         if (moved.current) {
-            // on a scrollé -> annuler le clic
-            moved.current = false;
-            return;
+            e.preventDefault();
+            e.stopPropagation();
+            moved.current = false; // reset
         }
-        cb?.();
+    };
+
+    const safeToggleActions = () => {
+        // ici, on ne teste pas moved: on l’a déjà annulé en capture si besoin
+        setShowActions(prev => !prev);
+    };
+
+    const safeImageClick = () => {
+        onClick?.();
     };
 
     const deletePostPictureFct = (e?: React.MouseEvent) => {
@@ -66,9 +75,10 @@ function PostCardPicture({
 
     const longPressHandlers = useLongPress(
         () => setShowActions(true),
-        () => onClick?.(),
+        () => {},  // on long press end
         { delay: 500 }
     );
+
 
     useEffect(() => {
         let started = false;
@@ -108,10 +118,12 @@ function PostCardPicture({
 
     return (
         <div className="relative group flex items-center justify-center"
+             onClickCapture={cancelIfDragged}
              onPointerDown={onPointerDown}
              onPointerMove={onPointerMove}
              onPointerUp={onPointerUp}
-             onClick={safeClick(() => setShowActions(prev => !prev))}
+             onPointerCancel={onPointerCancel}
+             onClick={safeToggleActions}
         >
             {isAdmin && (
                 <div className={` absolute top-2 right-4 z-10
@@ -136,10 +148,12 @@ function PostCardPicture({
                 loading="lazy"
                 draggable={false}
                 // mêmes gardes anti-faux-clic pour l'image
+                onClickCapture={cancelIfDragged}  // double filet de sécurité
                 onPointerDown={onPointerDown}
                 onPointerMove={onPointerMove}
                 onPointerUp={onPointerUp}
-                onClick={safeClick(onClick)}
+                onPointerCancel={onPointerCancel}
+                onClick={safeImageClick}
                 {...longPressHandlers}
             />
         </div>
