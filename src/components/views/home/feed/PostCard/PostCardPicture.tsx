@@ -28,7 +28,37 @@ function PostCardPicture({
     const [src, setSrc] = useState<string>(NoPreview);
     const [showActions, setShowActions] = useState(false);
     const {isAdmin} = useAuth();
-    const deletePostPictureFct = () => {
+
+    // --- anti-faux-clic ---
+    const startPos = useRef<{x:number; y:number} | null>(null);
+    const moved = useRef(false);
+    const MOVE_THRESHOLD = 8; // px
+
+    const onPointerDown = (e: React.PointerEvent) => {
+        startPos.current = { x: e.clientX, y: e.clientY };
+        moved.current = false;
+    };
+    const onPointerMove = (e: React.PointerEvent) => {
+        if (!startPos.current) return;
+        const dx = Math.abs(e.clientX - startPos.current.x);
+        const dy = Math.abs(e.clientY - startPos.current.y);
+        if (dx > MOVE_THRESHOLD || dy > MOVE_THRESHOLD) moved.current = true;
+    };
+    const onPointerUp = () => {
+        startPos.current = null;
+    };
+
+    const safeClick = (cb?: () => void) => () => {
+        if (moved.current) {
+            // on a scrollé -> annuler le clic
+            moved.current = false;
+            return;
+        }
+        cb?.();
+    };
+
+    const deletePostPictureFct = (e?: React.MouseEvent) => {
+        e?.stopPropagation();
         if (window.confirm("Êtes-vous sûr de vouloir supprimer cette image ?")) {
             onDeletePostPictureFct(index);
         }
@@ -77,7 +107,12 @@ function PostCardPicture({
     }, [picture.id, index]);
 
     return (
-        <div className="relative group flex items-center justify-center" onClick={() => setShowActions(prev => !prev)}>
+        <div className="relative group flex items-center justify-center"
+             onPointerDown={onPointerDown}
+             onPointerMove={onPointerMove}
+             onPointerUp={onPointerUp}
+             onClick={safeClick(() => setShowActions(prev => !prev))}
+        >
             {isAdmin && (
                 <div className={` absolute top-2 right-4 z-10
                 ${showActions ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none md:group-hover:opacity-100 md:group-hover:pointer-events-auto"}
@@ -100,7 +135,11 @@ function PostCardPicture({
                 className={`block ${className ?? ""}`}
                 loading="lazy"
                 draggable={false}
-                onClick={onClick}
+                // mêmes gardes anti-faux-clic pour l'image
+                onPointerDown={onPointerDown}
+                onPointerMove={onPointerMove}
+                onPointerUp={onPointerUp}
+                onClick={safeClick(onClick)}
                 {...longPressHandlers}
             />
         </div>

@@ -13,7 +13,6 @@ import {useMutation} from "@tanstack/react-query";
 import {postService} from "../../../../../services/api/postService.ts";
 import {AxiosError} from "axios";
 import {errorService} from "../../../../../services/util/errorService.ts";
-import {navigationService} from "../../../../../services/util/navigationService.ts";
 
 function PostCard({post, openPicturesModal, onDeletePostFct, onUpdatePostFct}: {
     post: Post,
@@ -95,7 +94,6 @@ function PostCard({post, openPicturesModal, onDeletePostFct, onUpdatePostFct}: {
         //On retire l'image de la liste
         setPictureList(prev => prev.filter((_, i) => i !== index));
     }
-
     return (
         <div key={post.id} className="max-w-xl mx-auto pl-4 pr-4 pt-1 pb-4
                 mb-3 bg-blue-50 text-black
@@ -133,7 +131,6 @@ function PostCard({post, openPicturesModal, onDeletePostFct, onUpdatePostFct}: {
                     {pictureList!.map((picture, index) => (
                         <PostCardPicture alt={"picture_" + index}
                                          index={index}
-                                         {...navigationService.useSafeClick(() => openPicturesModal(pictureList, index))}
                                          onClick={() => openPicturesModal(pictureList, index)}
                                          key={`${post.id}_${picture.id}`}
                                          picture={picture}
