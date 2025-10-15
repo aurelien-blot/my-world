@@ -28,7 +28,46 @@ function PostCardPicture({
     const [src, setSrc] = useState<string>(NoPreview);
     const [showActions, setShowActions] = useState(false);
     const {isAdmin} = useAuth();
-    const deletePostPictureFct = () => {
+
+    // --- anti-faux-clic ---
+    const start = useRef<{x:number; y:number} | null>(null);
+    const moved = useRef(false);
+    const MOVE_PX = 8;
+
+    const onPointerDown = (e: React.PointerEvent) => {
+        start.current = { x: e.clientX, y: e.clientY };
+        moved.current = false;
+    };
+
+    const onPointerMove = (e: React.PointerEvent) => {
+        if (!start.current) return;
+        const dx = Math.abs(e.clientX - start.current.x);
+        const dy = Math.abs(e.clientY - start.current.y);
+        if (dx > MOVE_PX || dy > MOVE_PX) moved.current = true;
+    };
+
+    const onPointerUp = () => { start.current = null; };
+    const onPointerCancel = () => { moved.current = true; start.current = null; };
+
+    const cancelIfDragged = (e: React.SyntheticEvent) => {
+        if (moved.current) {
+            e.preventDefault();
+            e.stopPropagation();
+            moved.current = false; // reset
+        }
+    };
+
+    const safeToggleActions = () => {
+        // ici, on ne teste pas moved: on l’a déjà annulé en capture si besoin
+        setShowActions(prev => !prev);
+    };
+
+    const safeImageClick = () => {
+        onClick?.();
+    };
+
+    const deletePostPictureFct = (e?: React.MouseEvent) => {
+        e?.stopPropagation();
         if (window.confirm("Êtes-vous sûr de vouloir supprimer cette image ?")) {
             onDeletePostPictureFct(index);
         }
@@ -36,9 +75,10 @@ function PostCardPicture({
 
     const longPressHandlers = useLongPress(
         () => setShowActions(true),
-        () => onClick?.(),
+        () => {},  // on long press end
         { delay: 500 }
     );
+
 
     useEffect(() => {
         let started = false;
@@ -77,7 +117,15 @@ function PostCardPicture({
     }, [picture.id, index]);
 
     return (
-        <div className="relative group flex items-center justify-center" onClick={() => setShowActions(prev => !prev)}>
+        <div className="relative group flex items-center justify-center"
+             onClickCapture={cancelIfDragged}
+             onPointerDown={onPointerDown}
+             onPointerMove={onPointerMove}
+             onPointerUp={onPointerUp}
+             onPointerCancel={onPointerCancel}
+             onClick={safeToggleActions}
+             onContextMenu={(e) => e.preventDefault()}
+        >
             {isAdmin && (
                 <div className={` absolute top-2 right-4 z-10
                 ${showActions ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none md:group-hover:opacity-100 md:group-hover:pointer-events-auto"}
@@ -100,7 +148,20 @@ function PostCardPicture({
                 className={`block ${className ?? ""}`}
                 loading="lazy"
                 draggable={false}
-                onClick={onClick}
+                // mêmes gardes anti-faux-clic pour l'image
+                onContextMenu={(e) => e.preventDefault()}
+                onDragStart={(e) => e.preventDefault()}
+                style={{
+                    userSelect: 'none',
+                    WebkitUserSelect: 'none',
+                    WebkitTouchCallout: 'none', // iOS: empêche le menu "Enregistrer l’image"
+                }}
+                onClickCapture={cancelIfDragged}  // double filet de sécurité
+                onPointerDown={onPointerDown}
+                onPointerMove={onPointerMove}
+                onPointerUp={onPointerUp}
+                onPointerCancel={onPointerCancel}
+                onClick={safeImageClick}
                 {...longPressHandlers}
             />
         </div>
