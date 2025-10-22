@@ -1,6 +1,7 @@
-import {createContext, type ReactNode, useState} from "react";
+import {createContext, type ReactNode, useEffect, useState} from "react";
 import type {User} from "../../models/User/user.ts";
 import type {LoginUserResponse} from "../../models/Login/loginUserResponse.ts";
+import {setupAxiosInterceptors} from "../../services/api/http.ts";
 
 type AuthContextType = {
     connectedUser: User | null;
@@ -32,6 +33,10 @@ export const AuthProvider = ({children}: { children: ReactNode }) => {
         setConnectedUser(null);
         setIsAdmin(false);
     };
+
+    useEffect(() => {
+        setupAxiosInterceptors(logout);
+    }, []);
 
     return (
         <AuthContext.Provider value={{connectedUser, isAdmin,  login, logout}}>
